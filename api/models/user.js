@@ -15,8 +15,12 @@ const userSchema = mongoose.Schema({
         match: /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
     },
     password: { type: String, required: true },
-
-    personalDetail : {
+    isVerified:{
+        type:Boolean
+    },
+    passwordResetToken: String,
+    passwordResetExpires: Date,
+   personalDetail : {
         type: mongoose.Schema.Types.ObjectId,
          ref:'Personaldetails'
     },
@@ -46,7 +50,7 @@ type:String
 },
 image:{
    data:Buffer,
-   type:string
+   type:String
 }
 
 });

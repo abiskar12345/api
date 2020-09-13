@@ -13,6 +13,10 @@ const PersonaldetailsSchema = mongoose.Schema({
         maxlength:2
 
     },
+    age:{
+        type:Number,
+        maxlength:2
+    },
     birthday:{
         type:Number,
         maxlength:2
@@ -30,6 +34,9 @@ const PersonaldetailsSchema = mongoose.Schema({
     },
     weight:{
         type: String
+    },
+    email:{
+        type:String
     },
     Aboutyourself:{
         type:String  

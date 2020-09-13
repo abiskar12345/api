@@ -1,16 +1,18 @@
 const mongoose = require('mongoose');
 const User = require("../models/user");
 const  partnerperferredSchema = mongoose.Schema({
-    // pid: mongoose.Schema.Types.ObjectId,
-    // product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-    // quantity: { type: Number, default: 1 }
-
    
-    agerange : {
-        type:String
+    lowerage : {
+        type:Number
     },
-    heightrange :{
-        type:String
+    higherage :{
+        type:Number
+    },
+    lowerheight : {
+        type:Number
+    },
+    higherheight :{
+        type:Number
     },
     countries:{
         type:String
