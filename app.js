@@ -11,10 +11,12 @@ const blockRoutes= require('./api/routes/blockcontroller');
 const likeRoutes= require('./api/routes/likedprofile');
 const verificationRoutes = require('./api/auth/token_validation');
 const planRoutes= require('./api/routes/plan');
+const locationRoutes= require('./api/routes/locationcontroller');
+
 
 mongoose.connect(
 
-  "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass%20Community&ssl=false",
+  "mongodb://mahajodiser:<password>@cluster0-shard-00-00.0n0bn.mongodb.net:27017,cluster0-shard-00-01.0n0bn.mongodb.net:27017,cluster0-shard-00-02.0n0bn.mongodb.net:27017/<dbname>?ssl=true&replicaSet=atlas-9pxmwp-shard-0&authSource=admin&retryWrites=true&w=majority",
   {
     useMongoClient: true
   },()=> console.log('connected to db')
@@ -50,6 +52,7 @@ app.use("/block", blockRoutes);
 app.use("/like", likeRoutes);
 app.use("/validate",verificationRoutes);
 app.use("/user/plan", planRoutes);
+app.use("/location", locationRoutes);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 app.use((req, res, next) => {

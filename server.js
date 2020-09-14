@@ -6,6 +6,10 @@ const port = process.env.PORT || 3000;
 
 const server = http.createServer(app);
 const socket =socketio(server);
-socket.listen(port) ;
+socket.on('connection', client => {
+    client.on('event', data => { /* … */ });
+    client.on('disconnect', () => { /* … */ });
+  });
+server.listen(port) ;
 
 
