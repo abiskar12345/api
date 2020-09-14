@@ -3,6 +3,8 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const User = require("../models/user");
 const multer = require('multer');
 const { checkToken } = require("../auth/token_validation");
@@ -71,17 +73,8 @@ router.post("/signup", (req, res, next) => {
             user
               .save()
               .then(result => {
-                console.log(result);
-                res.status(201).json({
-                  message: "User created"
-                });
-              })
-              .catch(err => {
-                console.log(err);
-                res.status(500).json({
-                  error: err
-                });
-              });
+              
+              
               var token = new Token({ _userId: user._id, token: crypto.randomBytes(16).toString('hex') });
               // Save the verification token
               token.save(function (err) {
@@ -102,10 +95,23 @@ router.post("/signup", (req, res, next) => {
               likedprofile
               .save()
               .then(result => {
-                console.log(result);
-                res.status(201).json({
-                  message: "likwedUser created"
+              })
+              .catch(err => {
+                res.status(500).json({
+                  error: err
                 });
+              });
+              const blockedprofile = new Blockedprofile({
+                profileiD: user._id
+
+              });
+              blockedprofile
+              .save()
+              .then(result => {
+                // console.log(result);
+                // res.status(201).json({
+                //   message: "blockeddUser created"
+                // });
               })
               .catch(err => {
                 console.log(err);
@@ -113,6 +119,17 @@ router.post("/signup", (req, res, next) => {
                   error: err
                 });
               });
+
+              // res.status(201).setHeader({
+              //   message: "User created"
+              // });
+            })
+            .catch(err => {
+              console.log(err);
+              res.status(500).json({
+                error: err
+              });
+            });
           }
 
          
@@ -229,14 +246,14 @@ router.get("/:email", (req, res, next) => {
    
     
       User.find(
-        // {"_id": { "$nin":[block[0].blockedusers]} }
+        {"_id": { "$nin":[block[0].blockedusers]} }
          )
       .populate({
        path:'personalDetail',
        model : 'Personaldetails',
-       match: [{'age':{ $gte: users.partnerperferred.loweraoge,
+       match: [{age:{ $gte: users.partnerperferred.loweraoge,
                  $lte: users.partnerperferred.higherage}},
-               {'height':{ $gte: users.partnerperferred.lowerheight ,
+               {height:{ $gte: users.partnerperferred.lowerheight ,
                 $lte: users.partnerperferred.higherheight}}]
                 ,
       

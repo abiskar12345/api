@@ -12,7 +12,7 @@ router.post("/:email", (req, res, next) => {
   Partnerperferred.find({ email: req.params.email })
     .exec()
     .then(user => {
-      if (user.length >= 1) {
+      if (user.length < 1) {
 
         const partnerperfered = new Partnerperferred({
            _id: new mongoose.Types.ObjectId(),
@@ -65,6 +65,19 @@ router.post("/:email", (req, res, next) => {
           education: req.body.education}
         ]
       })
+      .then(result => {
+        console.log(result);
+        res.status(201).json({
+          message: result
+         
+        });
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({
+          error: err
+        });
+      });
       }
       });
     });
