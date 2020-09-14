@@ -94,7 +94,7 @@ router.post('/resendtoken',(req,res,next)=>{
           
             auth: {
               user: "amazingstudiosab@gmail.com", // generated ethereal user
-              pass: "youtube@pass1", // generated ethereal password
+              pass: "", // generated ethereal password
             } });
           var mailOptions = { from: 'amazingstudios@gmail.com', to: user.email, subject: 'Account Verification Token', text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n' };
           transporter.sendMail(mailOptions, function (err) {
