@@ -11,9 +11,9 @@ router.post("/:email", (req, res, next) => {
 Personaldetails.find({ email: req.params.email })
     .exec()
     .then(user => {
+      // console.log(user);
       if (user.length < 1) {
         console.log("hii");
-
           const personaldetails = new Personaldetails({
           _id: new mongoose.Types.ObjectId(),
           email:req.params.email,
@@ -31,9 +31,10 @@ Personaldetails.find({ email: req.params.email })
         personaldetails
         .save()
         .then(result => {
-          console.log(result);
+          // console.log(result);
           res.status(201).json({
-            message: "Userdetails added"
+            message: "Userdetails added",
+            personaldetails
           });
         })
         .catch(err => {
@@ -84,6 +85,10 @@ Personaldetails.find({ email: req.params.email })
         });
       });
     }
+    // res.status(409).json({
+    //   status:"failed",
+    //   message:"User already added details"
+    // });
    });
     });
 
