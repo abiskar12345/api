@@ -85,7 +85,7 @@ router.post("/signup", (req, res, next) => {
               var mailOptions = { from: 'no-reply@yourwebapplication.com', to: user.email, subject: 'Account Verification Token', text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n' };
               transporter.sendMail(mailOptions, function (err) {
                   if (err) { return res.status(500).send({ msg: err.message }); }
-                  res.status(200).send('A verification email has been sent to ' + user.email + '.');
+//                   res.status(200).send('A verification email has been sent to ' + user.email + '.');
               });
         
               const likedprofile = new Likedprofile({
@@ -120,9 +120,9 @@ router.post("/signup", (req, res, next) => {
                 });
               });
 
-              // res.status(201).setHeader({
-              //   message: "User created"
-              // });
+              res.status(201).setHeader({
+                message: result
+              });
             })
             .catch(err => {
               console.log(err);
