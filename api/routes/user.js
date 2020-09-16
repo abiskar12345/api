@@ -120,7 +120,7 @@ router.post("/signup", (req, res, next) => {
                 });
               });
 
-              res.status(201).setHeader({
+              res.status(201).send({
                 message: result
               });
             })
