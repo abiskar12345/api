@@ -1,24 +1,15 @@
 const http = require('http');
-const dotenv = require('dotenv');
-const socketio = require("socket.io");
-const socket = require('./api/socket/socket');
-
-dotenv.config({path:'./config.env'});
 const app = require('./app');
+const socketio = require("socket.io");
 
-const port =process.env.PORT|3000;
+const port = process.env.PORT || 3000;
 
 const server = http.createServer(app);
-const io =socketio(server);
-
-io.on('connection',()=>{
-    console.log("conncected new user")
-})
-
-// const socket =io('localhost:3000');
-
+const socket =socketio(server);
+socket.on('connection', client => {
+    client.on('event', data => { /* … */ });
+    client.on('disconnect', () => { /* … */ });
+  });
 server.listen(port) ;
-
-// app.listen(port,()=>console.log("Server connected successfully...."));
 
 

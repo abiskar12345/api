@@ -3,6 +3,8 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const User = require("../models/user");
 const multer = require('multer');
 const { checkToken } = require("../auth/token_validation");
@@ -12,12 +14,6 @@ const Blockedprofile = require("../models/blockedprofile");
 const Token = require("../models/verificationtoken");
 // const Personaldetails = require("../models/personaldetails");
 // const Partnerperferred = require("../models/partnerperferred");
-
-
-// ************* my code ***************
-const crypto = require('crypto');
-const nodemailer = require('nodemailer');
-
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
     cb(null, './uploads/');
@@ -49,8 +45,6 @@ const upload = multer({
 
 
 
-
-
 router.post("/signup", (req, res, next) => {
   User.find({ email: req.body.email })
     .exec()
@@ -75,52 +69,63 @@ router.post("/signup", (req, res, next) => {
             user
               .save()
               .then(result => {
-                // console.log(result);
-                res.status(201).json({
-                  status :"success",
-                  message: "User created",
-                  data:{user}
-                });
+              
+              
+              var token = new Token({ _userId: user._id, token: crypto.randomBytes(16).toString('hex') });
+              // Save the verification token
+              token.save(function (err) {
+                if (err) { return res.status(500).send({ msg: err.message }); }
+              });
+
+              var transporter = nodemailer.createTransport({ service: 'Sendgrid', auth: { user: process.env.SENDGRID_USERNAME, pass: process.env.SENDGRID_PASSWORD } });
+              var mailOptions = { from: 'no-reply@yourwebapplication.com', to: user.email, subject: 'Account Verification Token', text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n' };
+              transporter.sendMail(mailOptions, function (err) {
+                  if (err) { return res.status(500).send({ msg: err.message }); }
+//                   res.status(200).send('A verification email has been sent to ' + user.email + '.');
+              });
+        
+              const likedprofile = new Likedprofile({
+                profileiD: user._id
+
+              });
+              likedprofile
+              .save()
+              .then(result => {
               })
               .catch(err => {
-                // console.log(err);
                 res.status(500).json({
                   error: err
                 });
               });
-              // var token = new Token({ _userId: user._id, token: crypto.randomBytes(16).toString('hex') });
-              // // Save the verification token
-              // token.save(function (err) {
-              //   if (err) { return res.status(500).send({ msg: err.message }); }
-              // });
+              const blockedprofile = new Blockedprofile({
+                profileiD: user._id
 
-              // var transporter = nodemailer.createTransport({ service: 'Sendgrid', auth: { user: process.env.SENDGRID_USERNAME, pass: process.env.SENDGRID_PASSWORD } });
-              // // var transporter = nodemailer.createTransport({ service: 'Sendgrid', auth: { user: 'amazingstudiosab@gmail.com', pass: 'youtube@pass1' } });
-              // var mailOptions = { from: 'no-reply@yourwebapplication.com', to: user.email, subject: 'Account Verification Token', text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n' };
-              // transporter.sendMail(mailOptions, function (err) {
-              //     if (err) { return res.status(500).send({ msg: err.message }); }
-              //     res.status(200).send('A verification email has been sent to ' + user.email + '.');
-              // });
-        
-              // const likedprofile = new Likedprofile({
-              //   profileiD: user._id
+              });
+              blockedprofile
+              .save()
+              .then(result => {
+                // console.log(result);
+                // res.status(201).json({
+                //   message: "blockeddUser created"
+                // });
+              })
+              .catch(err => {
+                console.log(err);
+                res.status(500).json({
+                  error: err
+                });
+              });
 
-              // });
-              // likedprofile
-              // .save()
-              // .then(result => {
-              //   // console.log(result);
-              //   res.status(201).json({
-              //     message: "likwedUser created",
-              //     data:result,
-              //   });
-              // });
-              // .catch(err => {
-              //   // console.log(err);
-              //   res.status(500).json({
-              //     error: err
-              //   });
-              // });
+              res.status(201).send({
+                message: result
+              });
+            })
+            .catch(err => {
+              console.log(err);
+              res.status(500).json({
+                error: err
+              });
+            });
           }
 
          
@@ -150,11 +155,11 @@ router.post("/login",(req,res , next)=>{
   User.find({ email: req.body.email })
   .exec()
   .then(user => {
-    // console.log(user)
+    console.log(user)
    
     if (user.length < 1) {
       return res.status(401).json({
-        message: "user dosent exists"
+        message: "ser dosent exists"
       });
     }
     bcrypt.compare(req.body.password,user[0].password,(err,result)=>{
@@ -165,6 +170,7 @@ router.post("/login",(req,res , next)=>{
         
       }
       if(result) {
+    
        const token = jwt.sign({
           email:user[0].email,
           password:user[0].password,
@@ -188,7 +194,7 @@ router.post("/login",(req,res , next)=>{
 
 
  .catch(err => {
-        // console.log(err);
+        console.log(err);
         res.status(500).json({
           error: err
         }) ;
@@ -211,9 +217,9 @@ router.get("/:email", (req, res, next) => {
       //  });
   } else {
     console.log( users);
-      res.status(201).json({
-         data:users
-       });
+      // res.status(201).json({
+      //    data:users
+      //  });
 
       Blockedprofile.find({profileiD: users._id})
       .exec(function(err, block) {
@@ -236,14 +242,14 @@ router.get("/:email", (req, res, next) => {
    
     
       User.find(
-        // {"_id": { "$nin":[block[0].blockedusers]} }
+        {"_id": { "$nin":[block[0].blockedusers]} }
          )
       .populate({
        path:'personalDetail',
        model : 'Personaldetails',
-       match: [{'age':{ $gte: users.partnerperferred.loweraoge,
+       match: [{age:{ $gte: users.partnerperferred.loweraoge,
                  $lte: users.partnerperferred.higherage}},
-               {'height':{ $gte: users.partnerperferred.lowerheight ,
+               {height:{ $gte: users.partnerperferred.lowerheight ,
                 $lte: users.partnerperferred.higherheight}}]
                 ,
       

@@ -3,15 +3,14 @@ const queryHandler = require('./qeryhandler');
 const CONSTANTS = require('../config/constant');
 
 class Socket{
+
 	constructor(socket){
-		socket =this.io;
+		this.io = socket;
 	}
 
 	socketEvents(){
 
 		this.io.on('connection', (socket) => {
-			
-			console.log("Server connected...");
 
 			/* Get the user's Chat list	*/
 			socket.on(`chat-list`, async (data) => {
